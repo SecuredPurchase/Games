@@ -98,6 +98,7 @@ html, body {
 .blue-side .move-btn.selected { color: #0879ee; }
 .red-side .move-btn.selected { color: #ed2029; }
 
+/* Hide every choice while waiting for both players */
 .move-btn.hidden-pick,
 .move-btn.hidden-pick.selected {
   background: #050505 !important;
@@ -107,7 +108,6 @@ html, body {
 }
 
 .move-btn.hidden-pick span { visibility: hidden; }
-
 .move-btn:disabled { cursor: default; }
 
 .status {
@@ -444,8 +444,9 @@ function beginCountdown() {
 function startPicking() {
   picks = { blue: null, red: null };
   locked = false;
+
   clearSelections();
-  hidePicks();
+  revealPicks(); // Show all six buttons before players choose
 
   setStatus("blue", "PICK NOW!");
   setStatus("red", "PICK NOW!");
@@ -460,8 +461,9 @@ buttons.forEach(btn => {
 
     if (picks[side]) return;
 
-    // Store the choice, but never visually reveal it yet.
     picks[side] = move;
+
+    // As soon as the first player picks, hide every choice.
     hidePicks();
 
     setStatus(side, "LOCKED IN ✓");
@@ -478,7 +480,7 @@ function settleRound() {
   let blueMove = picks.blue;
   let redMove = picks.red;
 
-  // Change only the rigged winner's displayed move.
+  // Secret rigging changes only the selected winning side's move.
   if (winnerMode === "blue") {
     blueMove = Object.keys(beats).find(move => beats[move] === redMove);
   } else if (winnerMode === "red") {
@@ -596,7 +598,7 @@ document.getElementById("settingsOverlay").addEventListener("click", event => {
   }
 });
 
-// Begin automatically with READY? → 3 → 2 → 1 → GO!
+// Start automatically: READY? → 3 → 2 → 1 → GO!
 hidePicks();
 updateRoundLabels();
 beginCountdown();
