@@ -1,251 +1,306 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rock Paper Scissors — Face Off</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blue vs Red | RPS</title>
 <style>
-  :root { --blue:#2588ff; --red:#ff465b; --bg:#090d18; --panel:#141b2b; --muted:#9aa7bd; }
-  * { box-sizing:border-box; }
-  body { margin:0; min-height:100vh; background:radial-gradient(circle at 50% 0%,#1a2540 0,#090d18 55%); color:#f7f9ff; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; display:flex; justify-content:center; align-items:center; padding:18px; }
-  .game { width:min(100%,980px); }
-  header { text-align:center; margin-bottom:20px; }
-  .eyebrow { color:#9eacc5; font-size:.72rem; letter-spacing:.22em; font-weight:800; text-transform:uppercase; }
-  h1 { margin:7px 0 5px; font-size:clamp(1.8rem,5vw,3rem); letter-spacing:-.04em; }
-  .sub { color:var(--muted); margin:0; font-size:.95rem; }
-  .scoreboard { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:18px 0 12px; }
-  .score { flex:1; border:1px solid #ffffff16; border-radius:16px; padding:12px 16px; background:#ffffff08; }
-  .score.blue { box-shadow:inset 3px 0 var(--blue); }
-  .score.red { box-shadow:inset -3px 0 var(--red); text-align:right; }
-  .team { font-size:.8rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
-  .blue .team { color:#69b0ff; } .red .team { color:#ff8190; }
-  .points { font-size:2rem; font-weight:900; line-height:1.1; margin-top:5px; }
-  .round-pill { white-space:nowrap; color:#d6deed; font-size:.78rem; border:1px solid #ffffff20; background:#121a2b; border-radius:999px; padding:9px 12px; }
-  .arena { position:relative; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; border:1px solid #ffffff20; border-radius:22px; min-height:360px; background:#101626; box-shadow:0 24px 70px #0007; }
-  .side { padding:24px clamp(12px,3vw,30px); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; position:relative; }
-  .side.blue-side { background:linear-gradient(145deg,#1479f329,#1479f305); }
-  .side.red-side { background:linear-gradient(215deg,#ff465b29,#ff465b05); }
-  .divider { position:absolute; top:0; bottom:0; left:50%; width:2px; transform:translateX(-50%); background:linear-gradient(transparent,#dce6ff88 15%,#dce6ff88 85%,transparent); z-index:2; }
-  .side h2 { font-size:1.25rem; margin:0 0 5px; }
-  .side.blue-side h2 { color:#69b0ff; } .side.red-side h2 { color:#ff8190; }
-  .hint { color:#a6b1c5; font-size:.78rem; margin:0 0 20px; }
-  .choices { display:flex; gap:9px; justify-content:center; flex-wrap:wrap; }
-  .choice { border:1px solid #ffffff22; background:#ffffff0c; color:white; border-radius:14px; width:clamp(74px,10vw,100px); min-height:91px; padding:11px 5px; cursor:pointer; transition:transform .15s,border-color .15s,background .15s; }
-  .choice:hover:not(:disabled) { transform:translateY(-3px); background:#ffffff18; border-color:#ffffff60; }
-  .blue-side .choice.selected { border-color:var(--blue); background:#2588ff28; box-shadow:0 0 0 2px #2588ff20; }
-  .red-side .choice.selected { border-color:var(--red); background:#ff465b28; box-shadow:0 0 0 2px #ff465b20; }
-  .choice:disabled { cursor:default; opacity:.82; }
-  .emoji { display:block; font-size:1.85rem; line-height:1.2; margin-bottom:7px; }
-  .choice-label { font-size:.72rem; font-weight:800; letter-spacing:.04em; }
-  .versus { position:absolute; z-index:3; left:50%; top:50%; transform:translate(-50%,-50%); display:grid; place-items:center; width:43px; height:43px; border-radius:50%; border:1px solid #ffffff40; background:#0b1120; color:#d9e3f6; font-size:.72rem; font-weight:900; box-shadow:0 5px 18px #0008; }
-  .picked { min-height:39px; margin-top:18px; font-size:1.65rem; }
-  .pick-label { color:#b9c4d8; font-size:.78rem; min-height:20px; }
-  .status { min-height:75px; display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:14px 8px; }
-  .status-main { font-size:clamp(1.25rem,4vw,2rem); font-weight:950; letter-spacing:-.03em; }
-  .status-main.blue-win { color:#69b0ff; } .status-main.red-win { color:#ff8190; } .status-main.draw { color:#f6d77b; }
-  .status-detail { color:#aab6ca; font-size:.82rem; margin-top:4px; }
-  .actions { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:4px; }
-  .primary,.secondary { border:0; border-radius:12px; padding:13px 22px; font-size:.9rem; font-weight:850; cursor:pointer; }
-  .primary { color:#07101d; background:#f4f7ff; } .primary:hover { background:#dfe8ff; }
-  .secondary { color:#d7e0f2; background:#ffffff12; border:1px solid #ffffff1c; }
-  button:focus-visible { outline:3px solid #fff; outline-offset:3px; }
-  .footer { text-align:center; margin-top:18px; color:#74829b; font-size:.72rem; }
-  .gear { position:fixed; right:15px; bottom:15px; width:42px; height:42px; border-radius:50%; background:#182237; border:1px solid #ffffff25; color:#dce6f7; cursor:pointer; font-size:1.15rem; box-shadow:0 6px 24px #0007; }
-  .settings { display:none; position:fixed; right:15px; bottom:67px; width:min(310px,calc(100vw - 30px)); border:1px solid #ffffff25; border-radius:18px; background:#111a2b; padding:18px; box-shadow:0 20px 60px #000b; z-index:10; }
-  .settings.open { display:block; }
-  .settings h3 { margin:0 0 4px; font-size:1.05rem; }
-  .settings p { margin:0 0 15px; color:#9eacc3; font-size:.78rem; line-height:1.45; }
-  .setting-row { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px 0; border-top:1px solid #ffffff12; font-size:.86rem; }
-  .toggle { appearance:none; width:42px; height:24px; border-radius:999px; background:#344158; position:relative; cursor:pointer; flex-shrink:0; transition:background .2s; }
-  .toggle:before { content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:white; border-radius:50%; transition:transform .2s; }
-  .toggle:checked { background:#2588ff; } .toggle:checked:before { transform:translateX(18px); }
-  #redRig:checked { background:var(--red); }
-  .tiny-note { font-size:.7rem; color:#7887a1; margin-top:12px; }
-  .countdown { position:absolute; z-index:5; inset:0; display:none; place-items:center; background:#080d19df; backdrop-filter:blur(5px); font-size:clamp(5rem,20vw,10rem); font-weight:1000; letter-spacing:-.08em; }
-  .countdown.show { display:grid; animation:pop .35s ease; }
-  @keyframes pop { from{transform:scale(.92);opacity:.2} to{transform:scale(1);opacity:1} }
-  @media(max-width:520px) { body{padding:12px;} .arena{min-height:335px;border-radius:17px;} .side{padding:19px 7px;} .choice{width:clamp(68px,21vw,88px);min-height:82px;} .emoji{font-size:1.55rem;} .choice-label{font-size:.66rem;} .hint{font-size:.7rem;} .score{padding:10px;} .points{font-size:1.6rem;} .round-pill{padding:8px;font-size:.7rem;} }
+*{box-sizing:border-box}
+body{margin:0;background:#080c15;color:white;font-family:Arial,sans-serif}
+.game{height:100dvh;display:grid;grid-template-rows:1fr 1fr}
+.half{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.blue{background:linear-gradient(145deg,#0755a9,#06162d);border-bottom:2px solid #fff}
+.red{background:linear-gradient(145deg,#9c142c,#280713)}
+.team{font-size:14px;font-weight:900;letter-spacing:4px}
+.score{font-size:34px;font-weight:900}
+.choices{display:flex;gap:12px}
+.choice{width:clamp(70px,20vw,100px);height:clamp(70px,20vw,100px);border-radius:50%;border:2px solid #ffffff66;background:#ffffff15;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer}
+.choice.selected{border:3px solid white;background:#ffffff35}
+.choice:disabled{opacity:.9}
+.emoji{font-size:30px}
+.label{font-size:9px;font-weight:bold;margin-top:4px}
+.pick{height:25px;font-weight:bold;font-size:14px}
+.center{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#080c15;border:1px solid #ffffff66;border-radius:25px;padding:9px 13px;font-size:12px;z-index:3;white-space:nowrap}
+.countdown{display:none;position:fixed;inset:0;background:#050913df;align-items:center;justify-content:center;font-size:100px;font-weight:900;z-index:5}
+.countdown.show{display:flex}
+.status{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#080c15f5;border:1px solid #ffffff55;border-radius:18px;padding:22px 15px;width:90%;max-width:380px;text-align:center;z-index:6}
+.status.show{display:block}
+#result{font-size:25px;font-weight:900}
+#detail{font-size:13px;color:#bac6dc;margin-top:8px}
+.blueWin{color:#70baff}.redWin{color:#ff8094}.draw{color:#ffe28b}
+.actions{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:7}
+.action{background:#101a2b;color:white;border:1px solid #ffffff55;border-radius:22px;padding:10px 13px;font-weight:bold;white-space:nowrap}
+.action:disabled{opacity:.35}
+.gear{position:fixed;right:10px;bottom:10px;z-index:10;width:35px;height:35px;border-radius:50%;background:#101a2b;color:white;border:1px solid #ffffff55}
+.settings{display:none;position:fixed;right:10px;bottom:53px;z-index:9;background:#111a2b;border:1px solid #ffffff44;border-radius:16px;padding:16px;width:min(285px,calc(100vw - 20px))}
+.settings.open{display:block}
+.settings h3{margin:0 0 8px}
+.settings p{font-size:12px;color:#aebbd0}
+.setting{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid #ffffff22;font-size:14px}
+input[type=checkbox]{width:19px;height:19px;accent-color:#2588ff}
 </style>
 </head>
 <body>
 <main class="game">
-  <header>
-    <div class="eyebrow">Head-to-head challenge</div>
-    <h1>Rock Paper Scissors</h1>
-    <p class="sub">Three rounds. One winner. Choose your move.</p>
-  </header>
-  <section class="scoreboard" aria-label="Score">
-    <div class="score blue"><div class="team">Blue team</div><div class="points" id="blueScore">0</div></div>
-    <div class="round-pill" id="roundLabel">ROUND 1 / 3</div>
-    <div class="score red"><div class="team">Red team</div><div class="points" id="redScore">0</div></div>
-  </section>
-  <section class="arena" aria-label="Game arena">
-    <div class="side blue-side">
-      <h2>BLUE</h2><p class="hint">Pick your move</p>
-      <div class="choices" id="blueChoices">
-        <button class="choice" data-side="blue" data-move="rock"><span class="emoji">✊</span><span class="choice-label">ROCK</span></button>
-        <button class="choice" data-side="blue" data-move="paper"><span class="emoji">✋</span><span class="choice-label">PAPER</span></button>
-        <button class="choice" data-side="blue" data-move="scissors"><span class="emoji">✌️</span><span class="choice-label">SCISSORS</span></button>
-      </div>
-      <div class="picked" id="bluePicked">❔</div><div class="pick-label" id="bluePickLabel">Waiting for Blue…</div>
-    </div>
-    <div class="divider"></div><div class="versus">VS</div>
-    <div class="side red-side">
-      <h2>RED</h2><p class="hint">Pick your move</p>
-      <div class="choices" id="redChoices">
-        <button class="choice" data-side="red" data-move="rock"><span class="emoji">✊</span><span class="choice-label">ROCK</span></button>
-        <button class="choice" data-side="red" data-move="paper"><span class="emoji">✋</span><span class="choice-label">PAPER</span></button>
-        <button class="choice" data-side="red" data-move="scissors"><span class="emoji">✌️</span><span class="choice-label">SCISSORS</span></button>
-      </div>
-      <div class="picked" id="redPicked">❔</div><div class="pick-label" id="redPickLabel">Waiting for Red…</div>
-    </div>
-    <div class="countdown" id="countdown">3</div>
-  </section>
-  <section class="status" aria-live="polite">
-    <div class="status-main" id="statusMain">READY?</div>
-    <div class="status-detail" id="statusDetail">Both sides choose a move to start the countdown.</div>
-  </section>
-  <div class="actions">
-    <button class="primary" id="nextButton" disabled>Next round →</button>
-    <button class="secondary" id="resetButton">Reset game</button>
+ <section class="half blue">
+  <div class="team">BLUE</div>
+  <div class="score" id="blueScore">0</div>
+  <div class="choices">
+   <button class="choice" data-side="blue" data-move="rock"><span class="emoji">✊</span><span class="label">ROCK</span></button>
+   <button class="choice" data-side="blue" data-move="paper"><span class="emoji">✋</span><span class="label">PAPER</span></button>
+   <button class="choice" data-side="blue" data-move="scissors"><span class="emoji">✌️</span><span class="label">SCISSORS</span></button>
   </div>
-  <div class="footer">Best of three rounds · Good luck to both sides</div>
+  <div class="pick" id="bluePick">Choose your move</div>
+ </section>
+ <section class="half red">
+  <div class="team">RED</div>
+  <div class="score" id="redScore">0</div>
+  <div class="choices">
+   <button class="choice" data-side="red" data-move="rock"><span class="emoji">✊</span><span class="label">ROCK</span></button>
+   <button class="choice" data-side="red" data-move="paper"><span class="emoji">✋</span><span class="label">PAPER</span></button>
+   <button class="choice" data-side="red" data-move="scissors"><span class="emoji">✌️</span><span class="label">SCISSORS</span></button>
+  </div>
+  <div class="pick" id="redPick">Choose your move</div>
+ </section>
 </main>
 
-<button class="gear" id="gear" aria-label="Open settings" title="Settings">⚙</button>
-<aside class="settings" id="settings" aria-label="Game settings">
-  <h3>Game settings</h3>
-  <p>Choose how the match behaves. Only one forced winner can be active at a time.</p>
-  <div class="setting-row"><label for="blueRig">Blue always wins</label><input class="toggle" type="checkbox" id="blueRig"></div>
-  <div class="setting-row"><label for="redRig">Red always wins</label><input class="toggle" type="checkbox" id="redRig"></div>
-  <div class="setting-row"><label for="fairMode">Fair mode</label><input class="toggle" type="checkbox" id="fairMode" checked></div>
-  <div class="tiny-note">Settings apply to the next round. For the prank, keep the settings panel out of sight 😭</div>
+<div class="center" id="round">ROUND 1 / 3 · VS</div>
+<div class="countdown" id="count">3</div>
+<div class="status" id="status">
+ <div id="result"></div>
+ <div id="detail"></div>
+</div>
+<div class="actions">
+ <button class="action" id="next" disabled>Next round →</button>
+ <button class="action" id="reset">Reset</button>
+</div>
+
+<button class="gear" id="gear" aria-label="Settings">⚙</button>
+<aside class="settings" id="settings">
+ <h3>Secret settings ⚙</h3>
+ <p>Choose the side that should always win.</p>
+ <div class="setting"><label for="blueRig">Blue always wins</label><input type="checkbox" id="blueRig"></div>
+ <div class="setting"><label for="redRig">Red always wins</label><input type="checkbox" id="redRig"></div>
+ <div class="setting"><label for="fair">Fair mode</label><input type="checkbox" id="fair" checked></div>
 </aside>
 
 <script>
-(() => {
-  const moves = {
-    rock: {emoji:'✊', label:'Rock'},
-    paper: {emoji:'✋', label:'Paper'},
-    scissors: {emoji:'✌️', label:'Scissors'}
-  };
-  const beats = {rock:'scissors', paper:'rock', scissors:'paper'};
-  const $ = id => document.getElementById(id);
-  let round = 1, blueScore = 0, redScore = 0, picks = {blue:null,red:null};
-  let locked = false, roundDone = false, gameOver = false, timerIds = [];
-  const choiceButtons = [...document.querySelectorAll('.choice')];
+const beats={rock:"scissors",paper:"rock",scissors:"paper"};
+const emojis={rock:"✊",paper:"✋",scissors:"✌️"};
+const names={rock:"Rock",paper:"Paper",scissors:"Scissors"};
 
-  function clearTimers(){ timerIds.forEach(clearTimeout); timerIds=[]; }
-  function schedule(fn, ms){ const id=setTimeout(fn,ms); timerIds.push(id); }
-  function setStatus(main, detail='', cls='') {
-    $('statusMain').textContent=main;
-    $('statusMain').className='status-main '+cls;
-    $('statusDetail').textContent=detail;
+let round=1,blueScore=0,redScore=0;
+let picks={blue:null,red:null};
+let locked=false,finished=false,gameOver=false;
+let timers=[];
+
+const $=id=>document.getElementById(id);
+
+function later(fn,ms){
+ timers.push(setTimeout(fn,ms));
+}
+
+function showPick(side,move){
+ $(side+"Pick").textContent=emojis[move]+" "+names[move];
+}
+
+function update(){
+ $("blueScore").textContent=blueScore;
+ $("redScore").textContent=redScore;
+ $("round").textContent=gameOver?"MATCH COMPLETE":"ROUND "+round+" / 3 · VS";
+}
+
+function announce(title,detail,color){
+ $("result").textContent=title;
+ $("result").className=color;
+ $("detail").textContent=detail;
+ $("status").classList.add("show");
+}
+
+function clearAnnouncement(){
+ $("status").classList.remove("show");
+}
+
+function resetPicks(){
+ picks={blue:null,red:null};
+ locked=false;
+ finished=false;
+ $("count").classList.remove("show");
+ $("next").disabled=true;
+ clearAnnouncement();
+
+ document.querySelectorAll(".choice").forEach(button=>{
+  button.disabled=false;
+  button.classList.remove("selected");
+ });
+
+ $("bluePick").textContent="Choose your move";
+ $("redPick").textContent="Choose your move";
+}
+
+function riggedWinner(){
+ if(!$("fair").checked && $("blueRig").checked)return "blue";
+ if(!$("fair").checked && $("redRig").checked)return "red";
+ return null;
+}
+
+function finishRound(){
+ let winner;
+ const rig=riggedWinner();
+
+ // Keep the opponent's choice unchanged.
+ // Only secretly change the selected winner's displayed move if needed.
+ if(rig==="blue"){
+  if(beats[picks.blue]!==picks.red){
+   picks.blue=Object.keys(beats).find(m=>beats[m]===picks.red);
   }
-  function updateScore(){
-    $('blueScore').textContent=blueScore;
-    $('redScore').textContent=redScore;
-    $('roundLabel').textContent=gameOver ? 'MATCH COMPLETE' : `ROUND ${round} / 3`;
+  winner="blue";
+ }else if(rig==="red"){
+  if(beats[picks.red]!==picks.blue){
+   picks.red=Object.keys(beats).find(m=>beats[m]===picks.blue);
   }
-  function renderPick(side, move){
-    $(side+'Picked').textContent=moves[move].emoji;
-    $(side+'PickLabel').textContent=moves[move].label;
-    document.querySelectorAll(`.choice[data-side="${side}"]`).forEach(b=>{
-      b.classList.toggle('selected', b.dataset.move===move);
-      b.disabled=true;
-    });
+  winner="red";
+ }else if(picks.blue===picks.red){
+  winner="draw";
+ }else{
+  winner=beats[picks.blue]===picks.red?"blue":"red";
+ }
+
+ // Update only the move display that was secretly changed.
+ showPick("blue",picks.blue);
+ showPick("red",picks.red);
+
+ document.querySelectorAll(".choice").forEach(button=>{
+  button.disabled=true;
+  button.classList.toggle(
+   "selected",
+   button.dataset.move===picks[button.dataset.side]
+  );
+ });
+
+ if(winner==="blue"){
+  blueScore++;
+  announce("BLUE WON!","Blue wins this round.","blueWin");
+ }else if(winner==="red"){
+  redScore++;
+  announce("RED WON!","Red wins this round.","redWin");
+ }else{
+  announce("DRAW!","Same move — no points.","draw");
+ }
+
+ finished=true;
+ locked=false;
+ update();
+
+ if(round>=3 || blueScore>=2 || redScore>=2){
+  gameOver=true;
+  update();
+
+  if(blueScore>redScore){
+   announce("BLUE WON THE MATCH!","Final score: "+blueScore+" - "+redScore,"blueWin");
+  }else if(redScore>blueScore){
+   announce("RED WON THE MATCH!","Final score: "+blueScore+" - "+redScore,"redWin");
+  }else{
+   announce("MATCH DRAW!","Final score: "+blueScore+" - "+redScore,"draw");
   }
-  function unlockChoices(){
-    choiceButtons.forEach(b=>{b.disabled=false;b.classList.remove('selected');});
-    ['blue','red'].forEach(s=>{$(s+'Picked').textContent='❔';$(s+'PickLabel').textContent=`Waiting for ${s==='blue'?'Blue':'Red'}…`;});
-  }
-  function resetPicks(){
-    picks={blue:null,red:null}; locked=false; roundDone=false;
-    $('countdown').classList.remove('show');
-    $('nextButton').disabled=true;
-    unlockChoices();
-  }
-  function forcedWinner(){
-    if ($('blueRig').checked && !$('redRig').checked && !$('fairMode').checked) return 'blue';
-    if ($('redRig').checked && !$('blueRig').checked && !$('fairMode').checked) return 'red';
-    return null;
-  }
-  function decide(){
-    let winner = null;
-    const forced=forcedWinner();
-    if (forced) {
-      // Keep the display believable: the forced winner's move beats the other move.
-      const b=picks.blue, r=picks.red;
-      if(forced==='blue' && beats[b]===r) winner='blue';
-      else if(forced==='blue') picks.red=beats[b];
-      else if(forced==='red' && beats[r]===b) winner='red';
-      else if(forced==='red') picks.blue=beats[r];
-    }
-    if (!winner) {
-      if(picks.blue===picks.red) winner='draw';
-      else winner=beats[picks.blue]===picks.red?'blue':'red';
-    }
-    renderPick('blue',picks.blue); renderPick('red',picks.red);
-    if(winner==='blue'){blueScore++;setStatus('BLUE WON!','Blue takes this round.','blue-win');}
-    else if(winner==='red'){redScore++;setStatus('RED WON!','Red takes this round.','red-win');}
-    else setStatus('IT’S A DRAW!','Same move — no points this round.','draw');
-    updateScore(); roundDone=true; locked=false;
-    if(round>=3 || blueScore>=2 || redScore>=2){
-      gameOver=true;
-      if(blueScore>redScore) setStatus('BLUE WON THE MATCH!','Final score: Blue '+blueScore+' — '+redScore+' Red.','blue-win');
-      else if(redScore>blueScore) setStatus('RED WON THE MATCH!','Final score: Blue '+blueScore+' — '+redScore+' Red.','red-win');
-      else setStatus('MATCH DRAW!','Final score: '+blueScore+' — '+redScore+'.','draw');
-      $('nextButton').textContent='Play again ↻';
-    } else {
-      $('nextButton').textContent='Next round →';
-    }
-    $('nextButton').disabled=false;
-  }
-  function startCountdown(){
-    if(locked || !picks.blue || !picks.red) return;
-    locked=true;
-    choiceButtons.forEach(b=>b.disabled=true);
-    setStatus('GET READY…','Rock, paper, scissors!');
-    const c=$('countdown'); c.classList.add('show');
-    [3,2,1].forEach((n,i)=>schedule(()=>{c.textContent=n;},i*650));
-    schedule(()=>{c.textContent='GO!';},1950);
-    schedule(()=>{c.classList.remove('show');decide();},2450);
-  }
-  choiceButtons.forEach(btn=>btn.addEventListener('click',()=>{
-    if(locked || roundDone || gameOver) return;
-    const side=btn.dataset.side;
-    picks[side]=btn.dataset.move;
-    document.querySelectorAll(`.choice[data-side="${side}"]`).forEach(b=>b.classList.toggle('selected',b===btn));
-    $(side+'Picked').textContent=moves[picks[side]].emoji;
-    $(side+'PickLabel').textContent=moves[picks[side]].label+' selected';
-    if(picks.blue && picks.red) startCountdown();
-  }));
-  $('nextButton').addEventListener('click',()=>{
-    if(gameOver){resetGame();return;}
-    if(!roundDone)return;
-    round++; resetPicks(); updateScore();
-    setStatus('ROUND '+round,'Both sides choose a move.');
-  });
-  function resetGame(){
-    clearTimers(); round=1;blueScore=0;redScore=0;gameOver=false;
-    $('nextButton').textContent='Next round →';
-    resetPicks();updateScore();setStatus('READY?','Both sides choose a move to start the countdown.');
-  }
-  $('resetButton').addEventListener('click',resetGame);
-  $('gear').addEventListener('click',()=>$('settings').classList.toggle('open'));
-  $('blueRig').addEventListener('change',()=>{
-    if($('blueRig').checked){$('redRig').checked=false;$('fairMode').checked=false;}
-    else if(!$('redRig').checked)$('fairMode').checked=true;
-  });
-  $('redRig').addEventListener('change',()=>{
-    if($('redRig').checked){$('blueRig').checked=false;$('fairMode').checked=false;}
-    else if(!$('blueRig').checked)$('fairMode').checked=true;
-  });
-  $('fairMode').addEventListener('change',()=>{
-    if($('fairMode').checked){$('blueRig').checked=false;$('redRig').checked=false;}
-  });
-  updateScore();
-})();
+  $("next").textContent="Play again ↻";
+ }else{
+  $("next").textContent="Next round →";
+ }
+
+ $("next").disabled=false;
+}
+
+function startCountdown(){
+ if(locked || !picks.blue || !picks.red)return;
+
+ locked=true;
+ document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+ clearAnnouncement();
+
+ const count=$("count");
+ count.classList.add("show");
+
+ [3,2,1].forEach((n,i)=>{
+  later(()=>count.textContent=n,i*650);
+ });
+
+ later(()=>count.textContent="GO!",1950);
+ later(()=>{
+  count.classList.remove("show");
+  finishRound();
+ },2450);
+}
+
+document.querySelectorAll(".choice").forEach(button=>{
+ button.addEventListener("click",()=>{
+  if(locked || finished || gameOver)return;
+
+  const side=button.dataset.side;
+  picks[side]=button.dataset.move;
+  showPick(side,picks[side]);
+
+  document.querySelectorAll('.choice[data-side="'+side+'"]')
+   .forEach(b=>b.classList.toggle("selected",b===button));
+
+  if(picks.blue && picks.red)startCountdown();
+ });
+});
+
+$("next").addEventListener("click",()=>{
+ if(gameOver){
+  resetGame();
+ }else if(finished){
+  round++;
+  resetPicks();
+  update();
+ }
+});
+
+function resetGame(){
+ timers.forEach(clearTimeout);
+ timers=[];
+ round=1;
+ blueScore=0;
+ redScore=0;
+ gameOver=false;
+ $("next").textContent="Next round →";
+ resetPicks();
+ update();
+}
+
+$("reset").addEventListener("click",resetGame);
+$("gear").addEventListener("click",()=>{
+ $("settings").classList.toggle("open");
+});
+
+$("blueRig").addEventListener("change",()=>{
+ if($("blueRig").checked){
+  $("redRig").checked=false;
+  $("fair").checked=false;
+ }else if(!$("redRig").checked){
+  $("fair").checked=true;
+ }
+});
+
+$("redRig").addEventListener("change",()=>{
+ if($("redRig").checked){
+  $("blueRig").checked=false;
+  $("fair").checked=false;
+ }else if(!$("blueRig").checked){
+  $("fair").checked=true;
+ }
+});
+
+$("fair").addEventListener("change",()=>{
+ if($("fair").checked){
+  $("blueRig").checked=false;
+  $("redRig").checked=false;
+ }
+});
+
+update();
 </script>
 </body>
 </html>
