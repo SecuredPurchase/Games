@@ -23,51 +23,53 @@ html, body {
 }
 
 .game {
-  width: 100%;
-  height: 100dvh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100dvh;
 }
 
 .side {
   position: relative;
-  height: 50%;
   width: 100%;
+  height: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 20px 12px;
-  overflow: hidden;
+  gap: 10px;
+  padding: 20px 10px;
 }
 
-.blue-side {
-  background: #0879ee;
-}
-
-.red-side {
-  background: #ed2029;
-}
+.blue-side { background: #0879ee; }
+.red-side { background: #ed2029; }
 
 .player-name {
-  font-size: clamp(22px, 6vw, 34px);
+  font-size: clamp(23px, 6vw, 34px);
   font-weight: 900;
   letter-spacing: 3px;
 }
 
 .score {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
-  opacity: .9;
+}
+
+.round-label {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  font-size: 12px;
+  font-weight: bold;
+  opacity: .85;
 }
 
 .choices {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: clamp(10px, 4vw, 24px);
-  margin-top: 8px;
+  margin-top: 5px;
 }
 
 .move-btn {
@@ -77,34 +79,25 @@ html, body {
   border: 3px solid rgba(255,255,255,.9);
   background: rgba(255,255,255,.18);
   color: white;
-  font-size: clamp(29px, 8vw, 42px);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: clamp(29px, 8vw, 42px);
   cursor: pointer;
-  transition: transform .12s, background .12s;
   user-select: none;
+  transition: transform .12s;
 }
 
-.move-btn:active {
-  transform: scale(.92);
-}
+.move-btn:active { transform: scale(.93); }
 
 .move-btn.selected {
   background: white;
-  color: #111;
   border-color: white;
 }
 
-.blue-side .move-btn.selected {
-  color: #0879ee;
-}
+.blue-side .move-btn.selected { color: #0879ee; }
+.red-side .move-btn.selected { color: #ed2029; }
 
-.red-side .move-btn.selected {
-  color: #ed2029;
-}
-
-/* During countdown, every choice looks black */
 .move-btn.hidden-pick,
 .move-btn.hidden-pick.selected {
   background: #050505 !important;
@@ -113,17 +106,13 @@ html, body {
   box-shadow: none !important;
 }
 
-.move-btn.hidden-pick span {
-  visibility: hidden;
-}
+.move-btn.hidden-pick span { visibility: hidden; }
 
-.move-btn:disabled {
-  cursor: default;
-}
+.move-btn:disabled { cursor: default; }
 
 .status {
-  min-height: 24px;
-  font-size: 15px;
+  min-height: 22px;
+  font-size: 14px;
   font-weight: bold;
   text-align: center;
 }
@@ -135,65 +124,115 @@ html, body {
   top: 50%;
   height: 2px;
   background: rgba(255,255,255,.45);
-  z-index: 3;
+  z-index: 2;
 }
 
 .gear {
   position: absolute;
-  top: 12px;
-  right: 13px;
-  border: none;
-  background: rgba(0,0,0,.18);
-  color: white;
-  border-radius: 50%;
+  top: 10px;
+  right: 12px;
   width: 34px;
   height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,.18);
+  color: white;
   font-size: 20px;
   cursor: pointer;
-  z-index: 5;
+  z-index: 4;
 }
 
-.round-label {
+.bottom-controls {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.small-btn {
+  padding: 9px 14px;
+  border: 1px solid rgba(255,255,255,.65);
+  border-radius: 20px;
+  background: rgba(0,0,0,.18);
+  color: white;
   font-size: 12px;
   font-weight: bold;
-  opacity: .85;
+  cursor: pointer;
 }
+
+.countdown {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: rgba(0,0,0,.12);
+}
+
+.countdown.show { display: flex; }
+
+.count-number {
+  font-size: clamp(70px, 24vw, 150px);
+  font-weight: 1000;
+  text-shadow: 0 5px 24px rgba(0,0,0,.4);
+}
+
+.result-banner {
+  display: none;
+  position: fixed;
+  z-index: 7;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: 90%;
+  padding: 13px 20px;
+  border: 2px solid rgba(255,255,255,.8);
+  border-radius: 14px;
+  background: #111;
+  color: white;
+  font-size: clamp(17px, 4.5vw, 24px);
+  font-weight: 900;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,.3);
+}
+
+.result-banner.show { display: block; }
 
 .overlay {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 10;
-  background: rgba(0,0,0,.75);
+  background: rgba(0,0,0,.78);
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
 
-.overlay.open {
-  display: flex;
-}
+.overlay.open { display: flex; }
 
 .panel {
+  width: min(340px, 100%);
+  padding: 23px;
+  border-radius: 18px;
   background: #171717;
   color: white;
-  width: min(340px, 100%);
-  border-radius: 18px;
-  padding: 23px;
   box-shadow: 0 10px 40px rgba(0,0,0,.45);
 }
 
 .panel h2 {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   font-size: 22px;
 }
 
 .panel p {
-  font-size: 14px;
   color: #ccc;
+  font-size: 14px;
   line-height: 1.4;
 }
 
@@ -207,8 +246,8 @@ html, body {
   width: 100%;
   padding: 12px;
   margin-top: 7px;
-  border-radius: 9px;
   border: 1px solid #555;
+  border-radius: 9px;
   background: #252525;
   color: white;
   font-size: 16px;
@@ -229,97 +268,25 @@ html, body {
   cursor: pointer;
 }
 
-.save-btn {
-  background: white;
-  color: #111;
-}
-
-.close-btn {
-  background: #353535;
-  color: white;
-}
-
-.countdown {
-  position: fixed;
-  inset: 0;
-  z-index: 8;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  background: rgba(0,0,0,.08);
-}
-
-.countdown.show {
-  display: flex;
-}
-
-.count-number {
-  font-size: clamp(100px, 32vw, 180px);
-  font-weight: 1000;
-  text-shadow: 0 6px 25px rgba(0,0,0,.35);
-}
-
-.result-banner {
-  position: fixed;
-  z-index: 7;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: max-content;
-  max-width: 90%;
-  text-align: center;
-  border-radius: 14px;
-  background: #111;
-  border: 2px solid rgba(255,255,255,.8);
-  color: white;
-  padding: 13px 20px;
-  font-size: clamp(17px, 4.5vw, 24px);
-  font-weight: 900;
-  display: none;
-  box-shadow: 0 8px 25px rgba(0,0,0,.3);
-}
-
-.result-banner.show {
-  display: block;
-}
-
-.bottom-controls {
-  position: absolute;
-  bottom: 10px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.small-btn {
-  border: 1px solid rgba(255,255,255,.65);
-  background: rgba(0,0,0,.18);
-  color: white;
-  padding: 9px 14px;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 12px;
-  cursor: pointer;
-}
+.save-btn { background: white; color: #111; }
+.close-btn { background: #353535; color: white; }
 
 @media (max-height: 570px) {
   .side { gap: 5px; padding: 12px 8px; }
-  .choices { margin-top: 2px; }
   .move-btn { width: 60px; height: 60px; font-size: 27px; }
   .player-name { font-size: 22px; }
+  .choices { margin-top: 2px; }
 }
 </style>
 </head>
 
 <body>
-<div class="game">
 
-  <section class="side blue-side" id="blueSide">
+<div class="game">
+  <section class="side blue-side">
     <div class="round-label" id="roundBlue">ROUND 1 / 3</div>
     <button class="gear" id="gear" aria-label="Settings">⚙</button>
+
     <div class="player-name">BLUE</div>
     <div class="score">Score: <span id="blueScore">0</span></div>
 
@@ -329,13 +296,14 @@ html, body {
       <button class="move-btn" data-side="blue" data-move="scissors" aria-label="Blue scissors"><span>✌️</span></button>
     </div>
 
-    <div class="status" id="blueStatus">Choose your move</div>
+    <div class="status" id="blueStatus">Get ready!</div>
   </section>
 
   <div class="middle-line"></div>
 
-  <section class="side red-side" id="redSide">
+  <section class="side red-side">
     <div class="round-label" id="roundRed">ROUND 1 / 3</div>
+
     <div class="player-name">RED</div>
     <div class="score">Score: <span id="redScore">0</span></div>
 
@@ -345,7 +313,7 @@ html, body {
       <button class="move-btn" data-side="red" data-move="scissors" aria-label="Red scissors"><span>✌️</span></button>
     </div>
 
-    <div class="status" id="redStatus">Choose your move</div>
+    <div class="status" id="redStatus">Get ready!</div>
 
     <div class="bottom-controls">
       <button class="small-btn" id="resetBtn">RESTART GAME</button>
@@ -354,7 +322,7 @@ html, body {
 </div>
 
 <div class="countdown" id="countdown">
-  <div class="count-number" id="countNumber">3</div>
+  <div class="count-number" id="countNumber">READY?</div>
 </div>
 
 <div class="result-banner" id="resultBanner"></div>
@@ -362,7 +330,7 @@ html, body {
 <div class="overlay" id="settingsOverlay">
   <div class="panel">
     <h2>⚙ Game Settings</h2>
-    <p>Secret setting: choose which color is guaranteed to win. The other player's displayed pick will stay the same.</p>
+    <p>Choose a secret winner or play fairly. In rigged mode, only the winning color's displayed move changes.</p>
 
     <label for="winnerMode">Winning mode</label>
     <select id="winnerMode">
@@ -392,33 +360,19 @@ const beats = {
   scissors: "paper"
 };
 
-const icons = {
-  rock: "✊",
-  paper: "✋",
-  scissors: "✌️"
-};
-
-let picks = {
-  blue: null,
-  red: null
-};
-
-let score = {
-  blue: 0,
-  red: 0
-};
-
-let round = 1;
-let totalRounds = 3;
-let winnerMode = "fair";
-let locked = false;
-let gameOver = false;
-let countdownTimers = [];
-
 const buttons = [...document.querySelectorAll(".move-btn")];
 const countdown = document.getElementById("countdown");
 const countNumber = document.getElementById("countNumber");
 const resultBanner = document.getElementById("resultBanner");
+
+let picks = { blue: null, red: null };
+let score = { blue: 0, red: 0 };
+let round = 1;
+let totalRounds = 3;
+let winnerMode = "fair";
+let locked = true;
+let gameOver = false;
+let timers = [];
 
 function setStatus(side, message) {
   document.getElementById(side + "Status").textContent = message;
@@ -435,21 +389,17 @@ function updateRoundLabels() {
   document.getElementById("roundRed").textContent = label;
 }
 
-function clearCountdownTimers() {
-  countdownTimers.forEach(clearTimeout);
-  countdownTimers = [];
+function clearTimers() {
+  timers.forEach(clearTimeout);
+  timers = [];
 }
 
 function hidePicks() {
-  buttons.forEach(btn => {
-    btn.classList.add("hidden-pick");
-  });
+  buttons.forEach(btn => btn.classList.add("hidden-pick"));
 }
 
 function revealPicks() {
-  buttons.forEach(btn => {
-    btn.classList.remove("hidden-pick");
-  });
+  buttons.forEach(btn => btn.classList.remove("hidden-pick"));
 }
 
 function clearSelections() {
@@ -463,20 +413,42 @@ function showMove(side, move) {
   const btn = buttons.find(b =>
     b.dataset.side === side && b.dataset.move === move
   );
-
-  if (btn) {
-    btn.classList.add("selected");
-  }
+  if (btn) btn.classList.add("selected");
 }
 
-function displayFinalMoves() {
-  revealPicks();
-  buttons.forEach(btn => {
-    btn.classList.remove("selected");
-  });
+function beginCountdown() {
+  locked = true;
+  buttons.forEach(btn => btn.disabled = true);
+  hidePicks();
+  countdown.classList.add("show");
 
-  showMove("blue", picks.blue);
-  showMove("red", picks.red);
+  const sequence = ["READY?", "3", "2", "1", "GO!"];
+
+  sequence.forEach((value, index) => {
+    const timer = setTimeout(() => {
+      countNumber.textContent = value;
+
+      if (value === "GO!") {
+        const finish = setTimeout(() => {
+          countdown.classList.remove("show");
+          startPicking();
+        }, 450);
+        timers.push(finish);
+      }
+    }, index * 750);
+
+    timers.push(timer);
+  });
+}
+
+function startPicking() {
+  picks = { blue: null, red: null };
+  locked = false;
+  clearSelections();
+  hidePicks();
+
+  setStatus("blue", "PICK NOW!");
+  setStatus("red", "PICK NOW!");
 }
 
 buttons.forEach(btn => {
@@ -486,58 +458,27 @@ buttons.forEach(btn => {
     const side = btn.dataset.side;
     const move = btn.dataset.move;
 
-    // Each side can choose once per round.
     if (picks[side]) return;
 
+    // Store the choice, but never visually reveal it yet.
     picks[side] = move;
-
-    // Hide all selections immediately so neither player sees the other's choice.
     hidePicks();
 
-    setStatus(side, "Move locked in ✓");
+    setStatus(side, "LOCKED IN ✓");
 
     if (picks.blue && picks.red) {
-      startCountdown();
+      locked = true;
+      buttons.forEach(b => b.disabled = true);
+      timers.push(setTimeout(settleRound, 500));
     }
   });
 });
-
-function startCountdown() {
-  if (locked || gameOver) return;
-
-  locked = true;
-  buttons.forEach(btn => btn.disabled = true);
-
-  // Keep all circles black for the entire countdown.
-  hidePicks();
-  countdown.classList.add("show");
-
-  const sequence = ["3", "2", "1", "GO!"];
-
-  sequence.forEach((number, index) => {
-    const timer = setTimeout(() => {
-      countNumber.textContent = number;
-
-      if (index === sequence.length - 1) {
-        const finishTimer = setTimeout(() => {
-          countdown.classList.remove("show");
-          settleRound();
-        }, 350);
-
-        countdownTimers.push(finishTimer);
-      }
-    }, index * 700);
-
-    countdownTimers.push(timer);
-  });
-}
 
 function settleRound() {
   let blueMove = picks.blue;
   let redMove = picks.red;
 
-  // Rigging changes only the winning side's displayed move.
-  // The other player's move remains exactly as selected.
+  // Change only the rigged winner's displayed move.
   if (winnerMode === "blue") {
     blueMove = Object.keys(beats).find(move => beats[move] === redMove);
   } else if (winnerMode === "red") {
@@ -547,7 +488,10 @@ function settleRound() {
   picks.blue = blueMove;
   picks.red = redMove;
 
-  displayFinalMoves();
+  revealPicks();
+  buttons.forEach(btn => btn.classList.remove("selected"));
+  showMove("blue", blueMove);
+  showMove("red", redMove);
 
   let winner = "tie";
 
@@ -558,75 +502,59 @@ function settleRound() {
   if (winner === "blue") {
     score.blue++;
     setStatus("blue", "ROUND WON!");
-    setStatus("red", "Round lost");
-    resultBanner.textContent = "🔵 BLUE WINS THE ROUND!";
+    setStatus("red", "ROUND LOST");
+    resultBanner.textContent = "🔵 BLUE WINS!";
   } else if (winner === "red") {
     score.red++;
     setStatus("red", "ROUND WON!");
-    setStatus("blue", "Round lost");
-    resultBanner.textContent = "🔴 RED WINS THE ROUND!";
+    setStatus("blue", "ROUND LOST");
+    resultBanner.textContent = "🔴 RED WINS!";
   } else {
-    setStatus("blue", "It's a tie!");
-    setStatus("red", "It's a tie!");
+    setStatus("blue", "TIE!");
+    setStatus("red", "TIE!");
     resultBanner.textContent = "🤝 IT'S A TIE!";
   }
 
   updateScore();
   resultBanner.classList.add("show");
 
-  const nextTimer = setTimeout(() => {
+  timers.push(setTimeout(() => {
     resultBanner.classList.remove("show");
 
     if (round >= totalRounds) {
       finishGame();
     } else {
       round++;
-      startNextRound();
+      updateRoundLabels();
+      beginCountdown();
     }
-  }, 1500);
-
-  countdownTimers.push(nextTimer);
-}
-
-function startNextRound() {
-  picks = { blue: null, red: null };
-  locked = false;
-
-  clearSelections();
-  hidePicks();
-  updateRoundLabels();
-
-  setStatus("blue", "Choose your move");
-  setStatus("red", "Choose your move");
+  }, 1600));
 }
 
 function finishGame() {
   gameOver = true;
   locked = true;
 
-  let message;
-
   if (score.blue > score.red) {
-    message = "🏆 BLUE WINS THE GAME!";
+    resultBanner.textContent = "🏆 BLUE WINS THE GAME!";
   } else if (score.red > score.blue) {
-    message = "🏆 RED WINS THE GAME!";
+    resultBanner.textContent = "🏆 RED WINS THE GAME!";
   } else {
-    message = "🤝 THE GAME IS A TIE!";
+    resultBanner.textContent = "🤝 THE GAME IS A TIE!";
   }
 
-  resultBanner.textContent = message;
   resultBanner.classList.add("show");
-  setStatus("blue", "Game over");
-  setStatus("red", "Game over");
+  setStatus("blue", "GAME OVER");
+  setStatus("red", "GAME OVER");
 }
 
 function resetGame() {
-  clearCountdownTimers();
+  clearTimers();
 
   picks = { blue: null, red: null };
   score = { blue: 0, red: 0 };
   round = 1;
-  locked = false;
+  locked = true;
   gameOver = false;
 
   updateScore();
@@ -637,8 +565,10 @@ function resetGame() {
   countdown.classList.remove("show");
   resultBanner.classList.remove("show");
 
-  setStatus("blue", "Choose your move");
-  setStatus("red", "Choose your move");
+  setStatus("blue", "Get ready!");
+  setStatus("red", "Get ready!");
+
+  beginCountdown();
 }
 
 document.getElementById("resetBtn").addEventListener("click", resetGame);
@@ -656,7 +586,6 @@ document.getElementById("closeSettings").addEventListener("click", () => {
 document.getElementById("saveSettings").addEventListener("click", () => {
   winnerMode = document.getElementById("winnerMode").value;
   totalRounds = Number(document.getElementById("roundCount").value);
-
   document.getElementById("settingsOverlay").classList.remove("open");
   resetGame();
 });
@@ -667,9 +596,11 @@ document.getElementById("settingsOverlay").addEventListener("click", event => {
   }
 });
 
-// Initially keep the choices looking identical and black until a round reveals.
+// Begin automatically with READY? → 3 → 2 → 1 → GO!
 hidePicks();
 updateRoundLabels();
+beginCountdown();
 </script>
+
 </body>
 </html>
